@@ -1,0 +1,54 @@
+classDiagram
+    class Person {
+        -string name
+        -int age
+        -string email
+        +getName() string
+        +getAge() int
+        +getEmail() string
+        +toArray() array
+    }
+
+    class PersonRepository {
+        <<interface>>
+        +savePerson(Person) void
+        +readPeople() array
+        +readPerson(string) Person
+    }
+
+    class RepositoryFactory {
+        <<interface>>
+        +createPersonRepository() PersonRepository
+    }
+
+    class DbPersonRepository {
+        -PDO conn
+        +savePerson(Person) void
+        +readPeople() array
+        +readPerson(string) Person
+    }
+
+    class FsPersonRepository {
+        -string dataDir
+        +savePerson(Person) void
+        +readPeople() array
+        +readPerson(string) Person
+        -getPersonFilePath(string) string
+    }
+
+    class DbRepositoryFactory {
+        +createPersonRepository() PersonRepository
+    }
+
+    class FsRepositoryFactory {
+        +createPersonRepository() PersonRepository
+    }
+
+    PersonRepository <|.. DbPersonRepository
+    PersonRepository <|.. FsPersonRepository
+    RepositoryFactory <|.. DbRepositoryFactory
+    RepositoryFactory <|.. FsRepositoryFactory
+    DbRepositoryFactory ..> DbPersonRepository : creates
+    FsRepositoryFactory ..> FsPersonRepository : creates
+    DbPersonRepository --> Person : uses
+    FsPersonRepository --> Person : uses

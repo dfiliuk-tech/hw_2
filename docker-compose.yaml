@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html
+      - sqlite-data:/var/sqlite
+    working_dir: /var/www/html
+    command: php -S 0.0.0.0:8000 -t .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/sqlite/database.sqlite
+    depends_on:
+      - sqlite
+
+  sqlite:
+    image: nouchka/sqlite3:latest
+    volumes:
+      - sqlite-data:/root/db
+    stdin_open: true
+    tty: true
+    command: /bin/sh -c "mkdir -p /root/db && sqlite3 /root/db/database.sqlite '.databases' && tail -f /dev/null"
+
+volumes:
+  sqlite-data:
