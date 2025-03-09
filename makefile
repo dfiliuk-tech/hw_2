@@ -32,7 +32,7 @@ autoload:
 
 # Run Abstract Factory demo
 run-abstract-factory:
-	docker-compose exec php php factory.php
+	docker-compose exec php php factory-demo.php
 
 # Run Adapter pattern demo
 run-adapter:

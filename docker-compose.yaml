@@ -5,9 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      platforms:
+        - "linux/amd64"
     volumes:
       - .:/var/www/html
-      - sqlite-data:/var/sqlite
     working_dir: /var/www/html
     command: php -S 0.0.0.0:8000 -t .
     ports:
@@ -20,11 +21,9 @@ services:
 
   sqlite:
     image: nouchka/sqlite3:latest
+    ports:
+      - "8191:8191"
     volumes:
-      - sqlite-data:/root/db
-    stdin_open: true
-    tty: true
-    command: /bin/sh -c "mkdir -p /root/db && sqlite3 /root/db/database.sqlite '.databases' && tail -f /dev/null"
+      - ./sqlite:/db
+    command: [ "tail", "-f", "/dev/null" ]
 
-volumes:
-  sqlite-data:

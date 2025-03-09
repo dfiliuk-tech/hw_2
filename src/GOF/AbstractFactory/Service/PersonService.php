@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\gof\AbstractFactory\Service;
+namespace App\GOF\AbstractFactory\Service;
 
-use App\gof\AbstractFactory\Entity\Person;
-use App\gof\AbstractFactory\Repository\PersonRepositoryInterface;
+use App\GOF\AbstractFactory\Entity\Person;
+use App\GOF\AbstractFactory\Repository\PersonRepositoryInterface;
 
 readonly class PersonService {
     public function __construct(

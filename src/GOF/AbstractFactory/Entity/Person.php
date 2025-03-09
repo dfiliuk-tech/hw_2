@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\gof\AbstractFactory\Entity;
+namespace App\GOF\AbstractFactory\Entity;
 
 readonly class Person {
 

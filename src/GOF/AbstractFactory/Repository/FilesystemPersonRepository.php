@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\gof\AbstractFactory\Repository;
+namespace App\GOF\AbstractFactory\Repository;
 
 
-use App\gof\AbstractFactory\Entity\Person;
+use App\GOF\AbstractFactory\Entity\Person;
 
 class FilesystemPersonRepository implements PersonRepositoryInterface {
     private string $dataDir;
