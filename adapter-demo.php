@@ -8,56 +8,85 @@ use App\GOF\Adapter\ASCIIStack;
 use App\GOF\Adapter\IntegerToASCIIAdapter;
 use App\GOF\Adapter\ASCIIToIntegerAdapter;
 
-// Demonstrate IntegerStack
-echo "=== IntegerStack ===\n";
-$integerStack = new IntegerStack();
-$integerStack->push(65); // ASCII for 'A'
-$integerStack->push(66); // ASCII for 'B'
-$integerStack->push(67); // ASCII for 'C'
+function separator(string $title): void {
+    echo PHP_EOL . str_repeat('-', 50) . PHP_EOL;
+    echo $title . PHP_EOL;
+    echo str_repeat('-', 50) . PHP_EOL;
+}
 
-echo "Popping IntegerStack: " . $integerStack->pop() . " (ASCII for 'C')\n";
-echo "Popping IntegerStack: " . $integerStack->pop() . " (ASCII for 'B')\n";
-echo "Popping IntegerStack: " . $integerStack->pop() . " (ASCII for 'A')\n";
-echo "Popping empty IntegerStack: " . ($integerStack->pop() === null ? "null" : $integerStack->pop()) . "\n\n";
+// Demo 1: Integer Stack
+separator('INTEGER STACK DEMO');
+$intStack = new IntegerStack();
 
-// Demonstrate ASCIIStack
-echo "=== ASCIIStack ===\n";
+echo "Pushing integers: 65, 66, 67" . PHP_EOL;
+$intStack->push(65);
+$intStack->push(66);
+$intStack->push(67);
+
+echo "Popping from integer stack:" . PHP_EOL;
+try {
+    echo "Popped: " . $intStack->pop() . " (ASCII for '" . chr(67) . "')" . PHP_EOL;
+    echo "Popped: " . $intStack->pop() . " (ASCII for '" . chr(66) . "')" . PHP_EOL;
+    echo "Popped: " . $intStack->pop() . " (ASCII for '" . chr(65) . "')" . PHP_EOL;
+
+    // This will throw an exception - stack is now empty
+    echo "Trying to pop from empty stack..." . PHP_EOL;
+    $intStack->pop();
+} catch (\RuntimeException $e) {
+    echo "Error: " . $e->getMessage() . PHP_EOL;
+}
+
+// Demo 2: ASCII Stack
+separator('ASCII STACK DEMO');
 $asciiStack = new ASCIIStack();
+
+echo "Pushing characters: 'A', 'B', 'C'" . PHP_EOL;
 $asciiStack->push('A');
 $asciiStack->push('B');
 $asciiStack->push('C');
 
-echo "Popping ASCIIStack: " . $asciiStack->pop() . "\n";
-echo "Popping ASCIIStack: " . $asciiStack->pop() . "\n";
-echo "Popping ASCIIStack: " . $asciiStack->pop() . "\n";
-echo "Popping empty ASCIIStack: " . ($asciiStack->pop() === null ? "null" : $asciiStack->pop()) . "\n\n";
+echo "Popping from ASCII stack:" . PHP_EOL;
+echo "Popped: " . $asciiStack->pop() . PHP_EOL;
+echo "Popped: " . $asciiStack->pop() . PHP_EOL;
+echo "Popped: " . $asciiStack->pop() . PHP_EOL;
+echo "Popped from empty stack: " . var_export($asciiStack->pop(), true) . PHP_EOL;
 
-// Demonstrate IntegerToASCIIAdapter
-echo "=== IntegerToASCIIAdapter ===\n";
-$integerStack = new IntegerStack();
-$asciiAdapter = new IntegerToASCIIAdapter($integerStack);
+// Demo 3: Integer to ASCII Adapter
+separator('INTEGER TO ASCII ADAPTER DEMO');
+$intStack = new IntegerStack();
+$intToAsciiAdapter = new IntegerToASCIIAdapter($intStack);
 
-$asciiAdapter->push('A');
-$asciiAdapter->push('B');
-$asciiAdapter->push('C');
+echo "Pushing characters through adapter: 'X', 'Y', 'Z'" . PHP_EOL;
+$intToAsciiAdapter->push('X');
+$intToAsciiAdapter->push('Y');
+$intToAsciiAdapter->push('Z');
 
-echo "IntegerStack contents (after pushing via adapter): " . implode(', ', $integerStack->getStack()) . " (ASCII values)\n";
-echo "Popping via adapter: " . $asciiAdapter->pop() . "\n";
-echo "Popping via adapter: " . $asciiAdapter->pop() . "\n";
-echo "Popping via adapter: " . $asciiAdapter->pop() . "\n";
-echo "Popping empty stack via adapter: " . ($asciiAdapter->pop() === null ? "null" : $asciiAdapter->pop()) . "\n\n";
+echo "Popping from adapter (original stack stores ASCII values):" . PHP_EOL;
+echo "Popped: " . $intToAsciiAdapter->pop() . PHP_EOL;
+echo "Popped: " . $intToAsciiAdapter->pop() . PHP_EOL;
+echo "Popped: " . $intToAsciiAdapter->pop() . PHP_EOL;
+echo "Popped from empty stack: " . var_export($intToAsciiAdapter->pop(), true) . PHP_EOL;
 
-// Demonstrate ASCIIToIntegerAdapter
-echo "=== ASCIIToIntegerAdapter ===\n";
+// Demo 4: ASCII to Integer Adapter
+separator('ASCII TO INTEGER ADAPTER DEMO');
 $asciiStack = new ASCIIStack();
-$integerAdapter = new ASCIIToIntegerAdapter($asciiStack);
+$asciiToIntAdapter = new ASCIIToIntegerAdapter($asciiStack);
 
-$integerAdapter->push(65); // ASCII for 'A'
-$integerAdapter->push(66); // ASCII for 'B'
-$integerAdapter->push(67); // ASCII for 'C'
+echo "Pushing integers through adapter: 72, 73, 74" . PHP_EOL;
+$asciiToIntAdapter->push(72); // 'H'
+$asciiToIntAdapter->push(73); // 'I'
+$asciiToIntAdapter->push(74); // 'J'
 
-echo "ASCIIStack contents (after pushing via adapter): " . implode(', ', $asciiStack->getStack()) . "\n";
-echo "Popping via adapter: " . $integerAdapter->pop() . " (ASCII for 'C')\n";
-echo "Popping via adapter: " . $integerAdapter->pop() . " (ASCII for 'B')\n";
-echo "Popping via adapter: " . $integerAdapter->pop() . " (ASCII for 'A')\n";
-echo "Popping empty stack via adapter: " . ($integerAdapter->pop() === null ? "null" : $integerAdapter->pop()) . "\n";
+echo "Popping from adapter (original stack stores characters):" . PHP_EOL;
+echo "Popped: " . $asciiToIntAdapter->pop() . " (ASCII for '" . chr(74) . "')" . PHP_EOL;
+echo "Popped: " . $asciiToIntAdapter->pop() . " (ASCII for '" . chr(73) . "')" . PHP_EOL;
+echo "Popped: " . $asciiToIntAdapter->pop() . " (ASCII for '" . chr(72) . "')" . PHP_EOL;
+
+try {
+    echo "Trying to pop from empty stack..." . PHP_EOL;
+    $asciiToIntAdapter->pop();
+} catch (\RuntimeException $e) {
+    echo "Error: " . $e->getMessage() . PHP_EOL;
+}
+
+echo PHP_EOL . "Demo completed successfully!" . PHP_EOL;

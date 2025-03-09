@@ -15,7 +15,7 @@ services:
       - "8000:8000"
     environment:
       - DB_CONNECTION=sqlite
-      - DB_DATABASE=/var/sqlite/database.sqlite
+      - DB_DATABASE=/var/www/html/database/database.sqlite
     depends_on:
       - sqlite
 
@@ -24,6 +24,4 @@ services:
     ports:
       - "8191:8191"
     volumes:
-      - ./sqlite:/db
-    command: [ "tail", "/dev/null" ]
-
+      - ./database:/db
