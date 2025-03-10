@@ -38,10 +38,6 @@ run-abstract-factory:
 run-adapter:
 	docker-compose exec php php adapter-demo.php
 
-# Run SQLite demo
-run-sqlite:
-	docker-compose exec php php sqlite-demo.php
-
 # Build or rebuild Docker containers
 build:
 	docker-compose build
