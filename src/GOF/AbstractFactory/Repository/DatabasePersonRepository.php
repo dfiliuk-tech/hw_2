@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\GOF\AbstractFactory\Repository;
@@ -8,10 +9,12 @@ use PDO;
 use PDOException;
 use RuntimeException;
 
-class DatabasePersonRepository implements PersonRepositoryInterface {
+class DatabasePersonRepository implements PersonRepositoryInterface
+{
     private PDO $conn;
 
-    public function __construct() {
+    public function __construct()
+    {
         try {
             // Use SQLite instead of MySQL
             $dbPath = getenv('DB_DATABASE') ?: __DIR__ . '/../../../../database/database.sqlite';
@@ -37,7 +40,8 @@ class DatabasePersonRepository implements PersonRepositoryInterface {
         }
     }
 
-    private function createTableIfNotExists(): void {
+    private function createTableIfNotExists(): void
+    {
         $sql = "CREATE TABLE IF NOT EXISTS people (
             name TEXT PRIMARY KEY,
             age INTEGER NOT NULL,
@@ -46,7 +50,8 @@ class DatabasePersonRepository implements PersonRepositoryInterface {
         $this->conn->exec($sql);
     }
 
-    public function savePerson(Person $person): void {
+    public function savePerson(Person $person): void
+    {
         // Use SQLite compatible SQL (no ON DUPLICATE KEY)
         $sql = "INSERT OR REPLACE INTO people (name, age, email) VALUES (?, ?, ?)";
 
@@ -58,7 +63,8 @@ class DatabasePersonRepository implements PersonRepositoryInterface {
         ]);
     }
 
-    public function readPeople(): array {
+    public function readPeople(): array
+    {
         $sql = "SELECT * FROM people";
         $stmt = $this->conn->query($sql);
 
@@ -70,7 +76,8 @@ class DatabasePersonRepository implements PersonRepositoryInterface {
         return $people;
     }
 
-    public function readPerson(string $name): ?Person {
+    public function readPerson(string $name): ?Person
+    {
         $sql = "SELECT * FROM people WHERE name = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$name]);

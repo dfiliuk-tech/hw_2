@@ -19,32 +19,32 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @var array<string, mixed>
      */
     private array $attributes = [];
-    
+
     /**
      * @var array<string, mixed>
      */
     private array $cookieParams = [];
-    
+
     /**
      * @var array<string, mixed>
      */
     private array $serverParams = [];
-    
+
     /**
      * @var array<string, mixed>
      */
     private array $queryParams = [];
-    
+
     /**
      * @var array<string, UploadedFileInterface>
      */
     private array $uploadedFiles = [];
-    
+
     /**
      * @var null|array<string, mixed>|object
      */
     private $parsedBody;
-    
+
     /**
      * Create a new server request
      *
@@ -66,7 +66,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         parent::__construct($method, $uri, $headers, $body, $version);
         $this->serverParams = $serverParams;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -74,7 +74,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         return $this->serverParams;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -82,7 +82,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         return $this->cookieParams;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -90,10 +90,10 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         $new = clone $this;
         $new->cookieParams = $cookies;
-        
+
         return $new;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -101,7 +101,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         return $this->queryParams;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -109,10 +109,10 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         $new = clone $this;
         $new->queryParams = $query;
-        
+
         return $new;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -120,7 +120,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         return $this->uploadedFiles;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -128,10 +128,10 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         $new = clone $this;
         $new->uploadedFiles = $uploadedFiles;
-        
+
         return $new;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -139,7 +139,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         return $this->parsedBody;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -148,13 +148,13 @@ class ServerRequest extends Request implements ServerRequestInterface
         if (!is_array($data) && !is_object($data) && $data !== null) {
             throw new InvalidArgumentException('Parsed body must be array, object or null');
         }
-        
+
         $new = clone $this;
         $new->parsedBody = $data;
-        
+
         return $new;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -162,7 +162,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         return $this->attributes;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -171,10 +171,10 @@ class ServerRequest extends Request implements ServerRequestInterface
         if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
         }
-        
+
         return $default;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -182,10 +182,10 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         $new = clone $this;
         $new->attributes[$name] = $value;
-        
+
         return $new;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -194,13 +194,13 @@ class ServerRequest extends Request implements ServerRequestInterface
         if (!array_key_exists($name, $this->attributes)) {
             return $this;
         }
-        
+
         $new = clone $this;
         unset($new->attributes[$name]);
-        
+
         return $new;
     }
-    
+
     /**
      * Create a ServerRequest from global variables
      *
@@ -213,15 +213,15 @@ class ServerRequest extends Request implements ServerRequestInterface
         $uri = self::createUriFromGlobals($_SERVER);
         $body = new Stream('php://input');
         $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? str_replace('HTTP/', '', $_SERVER['SERVER_PROTOCOL']) : '1.1';
-        
+
         $serverRequest = new ServerRequest($method, $uri, $headers, $body, $protocol, $_SERVER);
-        
+
         return $serverRequest
             ->withCookieParams($_COOKIE)
             ->withQueryParams($_GET)
             ->withParsedBody($_POST);
     }
-    
+
     /**
      * Create a Uri from global server variables
      *
@@ -231,26 +231,26 @@ class ServerRequest extends Request implements ServerRequestInterface
     private static function createUriFromGlobals(array $server): Uri
     {
         $uri = new Uri();
-        
+
         // HTTP host
         if (isset($server['HTTP_HOST'])) {
             $uri = $uri->withHost($server['HTTP_HOST']);
         } elseif (isset($server['SERVER_NAME'])) {
             $uri = $uri->withHost($server['SERVER_NAME']);
         }
-        
+
         // HTTPS
         if (isset($server['HTTPS']) && $server['HTTPS'] !== 'off') {
             $uri = $uri->withScheme('https');
         } else {
             $uri = $uri->withScheme('http');
         }
-        
+
         // Port
         if (isset($server['SERVER_PORT'])) {
             $uri = $uri->withPort((int)$server['SERVER_PORT']);
         }
-        
+
         // Path
         $requestUri = $server['REQUEST_URI'] ?? '';
         if ($requestUri !== '') {
@@ -261,7 +261,7 @@ class ServerRequest extends Request implements ServerRequestInterface
                 $uri = $uri->withQuery($uriParts[1]);
             }
         }
-        
+
         return $uri;
     }
 }

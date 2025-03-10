@@ -16,12 +16,12 @@ use App\Framework\Http\Response;
 class Application
 {
     private Router $router;
-    
+
     public function __construct(Router $router)
     {
         $this->router = $router;
     }
-    
+
     /**
      * Handle the HTTP request and generate a response
      *
@@ -33,15 +33,14 @@ class Application
         try {
             $route = $this->router->match($request);
             $result = $this->router->dispatch($route, $request);
-            
+
             // If the result is already a response, return it
             if ($result instanceof ResponseInterface) {
                 return $result;
             }
-            
+
             // Otherwise, wrap it in a response
             return $this->wrapResponse($result);
-            
         } catch (RouteNotFoundException $e) {
             return new Response(
                 404,
@@ -58,7 +57,7 @@ class Application
             );
         }
     }
-    
+
     /**
      * Wrap a controller result in a Response if needed
      *
@@ -75,7 +74,7 @@ class Application
                 $result
             );
         }
-        
+
         // Handle array/object results as JSON
         if (is_array($result) || is_object($result)) {
             return new Response(
@@ -84,7 +83,7 @@ class Application
                 json_encode($result) ?: '{}'
             );
         }
-        
+
         // Default empty response
         return new Response(
             204,

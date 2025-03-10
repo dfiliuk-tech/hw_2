@@ -6,15 +6,25 @@
          cacheDirectory=".phpunit.cache">
   <testsuites>
     <testsuite name="Framework">
-      <directory>tests/Framework</directory>
+      <directory>tests/App/Framework</directory>
     </testsuite>
     <testsuite name="App">
-      <directory>tests/App</directory>
+      <directory>tests/App/FrameworkApp</directory>
     </testsuite>
   </testsuites>
+  <coverage>
+    <report>
+      <html outputDirectory="coverage"/>
+      <text outputFile="php://stdout" showOnlySummary="true"/>
+    </report>
+  </coverage>
   <source>
     <include>
-      <directory>src</directory>
+      <directory suffix=".php">src/Framework</directory>
+      <directory suffix=".php">src/FrameworkApp</directory>
     </include>
+    <exclude>
+      <directory>src/GOF/AbstractFactory/data</directory>
+    </exclude>
   </source>
 </phpunit>

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Framework\Http;
+namespace Tests\App\Framework\Http;
 
 use App\Framework\Http\Uri;
 use PHPUnit\Framework\TestCase;

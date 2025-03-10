@@ -19,6 +19,3 @@ class HomeController
                 </ul>";
     }
 }
-
-
-
