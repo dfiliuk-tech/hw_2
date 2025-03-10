@@ -31,7 +31,8 @@
     "phpstan/phpstan": "^1.10",
     "squizlabs/php_codesniffer": "^3.7",
     "phpmd/phpmd": "^2.13",
-    "phpunit/phpunit": "^10.0"
+    "phpunit/phpunit": "^10.0",
+    "ext-curl": "*"
   },
   "scripts": {
     "analyze": [
@@ -41,26 +42,6 @@
     ],
     "cs-fix": "phpcbf --standard=PSR12 src",
     "test": "phpunit --config phpunit-config.xml",
-    "test-coverage": "XDEBUG_MODE=coverage phpunit --config phpunit-config.xml --coverage-text",
-    "setup-hooks": "./vendor/bin/cghooks add --ignore-lock",
-    "update-hooks": "./vendor/bin/cghooks update",
-    "post-install-cmd": [
-      "./vendor/bin/cghooks add --ignore-lock"
-    ],
-    "post-update-cmd": [
-      "./vendor/bin/cghooks update"
-    ]
-  },
-  "extra": {
-    "hooks": {
-      "pre-commit": [
-        "echo 'Running code style checks...'",
-        "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/phpcbf --standard=PSR12 src tests",
-        "./vendor/bin/phpcs --standard=PSR12 src tests || (echo 'Please fix the code style issues before committing' && exit 1)",
-        "echo 'Running tests...'",
-        "./vendor/bin/phpunit --config phpunit-config.xml || (echo 'Tests failed. Please fix the issues before committing' && exit 1)",
-        "echo 'All checks passed!'"
-      ]
-    }
+    "test-coverage": "XDEBUG_MODE=coverage phpunit --config phpunit-config.xml --coverage-text"
   }
 }

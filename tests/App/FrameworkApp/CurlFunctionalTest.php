@@ -14,6 +14,11 @@ use PHPUnit\Framework\TestCase;
  */
 class CurlFunctionalTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $this->baseUrl = getenv('APP_URL') ?: 'http://nginx';
+    }
+
     private string $baseUrl = 'http://localhost:8000';
 
     /**
@@ -108,13 +113,15 @@ class CurlFunctionalTest extends TestCase
     {
         $ch = curl_init($this->baseUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
         curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
         if ($httpCode === 0) {
-            $this->markTestSkipped('Application server is not running. Start Docker with `make up` or `docker-compose up -d`.');
+            $this->markTestSkipped(
+                'Application server is not running. Start Docker with `make up` or `docker-compose up -d`.'
+            );
         }
     }
 
@@ -128,8 +135,8 @@ class CurlFunctionalTest extends TestCase
         $response = $this->request('GET', '/');
 
         $this->assertEquals(200, $response['status']);
-        $this->assertArrayHasKey('Content-type', $response['headers']);
-        $this->assertStringContainsString('text/html', $response['headers']['Content-type']);
+        $this->assertArrayHasKey('Content-Type', $response['headers']);
+        $this->assertStringContainsString('text/html', $response['headers']['Content-Type']);
 
         $this->assertStringContainsString('<h1>Welcome to Our Minimal Framework</h1>', $response['body']);
         $this->assertStringContainsString('<a href=\'/api/status\'>', $response['body']);

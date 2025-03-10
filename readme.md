@@ -42,9 +42,3 @@ If you prefer to run without Docker:
 4. Create an empty SQLite database: `touch database/database.sqlite`
 5. Run `php sqlite-demo.php` or `php adapter-demo.php`
 
-## Implementation Details
-
-- The project uses PHP 8.1+ features including strict types and readonly properties
-- The SQLite implementation demonstrates persistence across application runs
-- Both adapters showcase how to convert between incompatible interfaces
-- The Docker setup provides an isolated environment with all dependencies
