@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Framework\Http\Message;
 
+use App\Framework\Http\Stream;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 use InvalidArgumentException;

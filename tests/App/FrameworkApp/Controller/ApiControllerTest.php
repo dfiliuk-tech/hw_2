@@ -6,6 +6,8 @@ namespace Tests\App\FrameworkApp\Controller;
 
 use App\Framework\Http\ServerRequest;
 use App\Framework\Http\Uri;
+use App\Framework\Security\SecurityMiddleware;
+use App\Framework\View\TwigService;
 use App\FrameworkApp\Controller\ApiController;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -16,7 +18,9 @@ class ApiControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->apiController = new ApiController();
+        $this->twig = $this->createMock(TwigService::class);
+        $this->security = $this->createMock(SecurityMiddleware::class);
+        $this->apiController = new ApiController($this->twig, $this->security);
     }
 
     public function testStatusReturnsValidJsonResponse(): void
@@ -35,13 +39,13 @@ class ApiControllerTest extends TestCase
 
         // Decode the response body
         $content = json_decode((string)$response->getBody(), true);
-        
+
         // Assert the JSON structure
         $this->assertIsArray($content);
         $this->assertArrayHasKey('status', $content);
         $this->assertArrayHasKey('version', $content);
         $this->assertArrayHasKey('timestamp', $content);
-        
+
         // Assert the content values
         $this->assertEquals('OK', $content['status']);
         $this->assertEquals('1.0.0', $content['version']);
@@ -64,13 +68,13 @@ class ApiControllerTest extends TestCase
 
         // Decode the response body
         $content = json_decode((string)$response->getBody(), true);
-        
+
         // Assert the JSON structure
         $this->assertIsArray($content);
         $this->assertArrayHasKey('status', $content);
         $this->assertArrayHasKey('updated', $content);
         $this->assertArrayHasKey('timestamp', $content);
-        
+
         // Assert the content values
         $this->assertEquals('unknown', $content['status']);
         $this->assertTrue($content['updated']);
@@ -82,7 +86,7 @@ class ApiControllerTest extends TestCase
         // Create a request with custom status in body
         $uri = new Uri('http://example.com/api/status');
         $request = new ServerRequest('POST', $uri);
-        
+
         // Create a request with body parameters
         $request = $request->withParsedBody(['status' => 'maintenance']);
 
@@ -91,7 +95,7 @@ class ApiControllerTest extends TestCase
 
         // Decode the response body
         $content = json_decode((string)$response->getBody(), true);
-        
+
         // Assert the status is updated correctly
         $this->assertEquals('maintenance', $content['status']);
         $this->assertTrue($content['updated']);

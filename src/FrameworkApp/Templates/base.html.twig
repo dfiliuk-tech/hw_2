@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="EN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Secure Framework{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .nav {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #333;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .error {
+            color: #d9534f;
+            margin-bottom: 15px;
+        }
+        .success {
+            color: #5cb85c;
+            margin-bottom: 15px;
+        }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>{% block header %}Secure Framework{% endblock %}</h1>
+        <div>
+            {% if user %}
+                <span>Welcome, {{ user.username }}</span>
+                <a href="{{ '/logout' }}" class="btn btn-secondary">Logout</a>
+            {% else %}
+                <a href="{{ '/login' }}" class="btn">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="{{ '/' }}">Home</a>
+        <a href="{{ '/contact' }}">Contact</a>
+        <a href="{{ '/api/status' }}">API Status</a>
+        {% if user and is_granted('ROLE_ADMIN', user) %}
+            <a href="{{ '/admin' }}">Admin Dashboard</a>
+        {% endif %}
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <div class="footer">
+        {% block footer %}
+            <p>&copy; {{ "now"|date("Y") }} Secure Framework. All rights reserved.</p>
+        {% endblock %}
+    </div>
+</div>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

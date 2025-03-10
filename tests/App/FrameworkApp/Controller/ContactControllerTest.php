@@ -7,6 +7,8 @@ namespace Tests\App\FrameworkApp\Controller;
 use App\Framework\Http\Response;
 use App\Framework\Http\ServerRequest;
 use App\Framework\Http\Uri;
+use App\Framework\Security\SecurityMiddleware;
+use App\Framework\View\TwigService;
 use App\FrameworkApp\Controller\ContactController;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +18,10 @@ class ContactControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->contactController = new ContactController();
+        $this->twig = $this->createMock(TwigService::class);
+        $this->security = $this->createMock(SecurityMiddleware::class);
+
+        $this->contactController = new ContactController($this->twig, $this->security);
     }
 
     public function testShowReturnsValidResponse(): void
@@ -35,7 +40,10 @@ class ContactControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         // Assert Content-Type header
-        $this->assertEquals('text/html', $response->getHeaderLine('Content-Type'));
+        $this->assertStringContainsString(
+            'text/html',
+            $response->getHeaderLine('Content-Type')
+        );
 
         // Get body content
         $body = (string) $response->getBody();

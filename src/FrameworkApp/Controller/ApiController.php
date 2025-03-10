@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\FrameworkApp\Controller;
 
+use App\Framework\Controller\AbstractController;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use App\Framework\Http\Response;
 
-class ApiController
+class ApiController extends AbstractController
 {
     public function status(ServerRequestInterface $request): ResponseInterface
     {
@@ -18,11 +18,7 @@ class ApiController
             'timestamp' => time()
         ];
 
-        return new Response(
-            200,
-            ['Content-Type' => 'application/json'],
-            json_encode($data)
-        );
+        return $this->json($data);
     }
 
     public function update(ServerRequestInterface $request): ResponseInterface
@@ -37,10 +33,6 @@ class ApiController
             'timestamp' => time()
         ];
 
-        return new Response(
-            200,
-            ['Content-Type' => 'application/json'],
-            json_encode($data)
-        );
+        return $this->json($data);
     }
 }

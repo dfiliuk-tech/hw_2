@@ -10,6 +10,8 @@ use App\Framework\Http\ServerRequest;
 use App\Framework\Http\Uri;
 use App\Framework\Routing\Exception\RouteNotFoundException;
 use App\Framework\Routing\Router;
+use App\Framework\Security\DatabaseAuthProvider;
+use App\Framework\Security\SecurityMiddleware;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -21,16 +23,20 @@ class ApplicationTest extends TestCase
     private Router $router;
     private Application $app;
 
+    private SecurityMiddleware $securityMiddleware;
+
     /**
      * @throws Exception
      */
     protected function setUp(): void
     {
-        // Create a mock router instead of container
+
         $this->router = $this->createMock(Router::class);
 
+        $this->securityMiddleware = $this->createMock(SecurityMiddleware::class);
+
         // Create the application with the router
-        $this->app = new Application($this->router);
+        $this->app = new Application($this->router, new SecurityMiddleware(new DatabaseAuthProvider(new \PDO('dns'))));
     }
 
     public function testHandleSuccessfulRequest(): void

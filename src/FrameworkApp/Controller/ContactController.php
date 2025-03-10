@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\FrameworkApp\Controller;
 
+use App\Framework\Controller\AbstractController;
 use App\Framework\Http\Response;
-use Psr\Http\Message\ServerRequestInterface;
+use App\Framework\Http\ServerRequest;
+use App\Framework\Security\SecurityMiddleware;
+use App\Framework\View\TwigService;
 
-class ContactController
+class ContactController extends AbstractController
 {
-    public function show(ServerRequestInterface $request): Response
+    public function __construct(TwigService $twig, SecurityMiddleware $security)
     {
+        parent::__construct($twig, $security);
+    }
 
-        return new Response(
-            200,
-            ['Content-Type' => 'text/html'],
-            "<h1>Contact Us</h1>
-                <p>This is a simple contact page.</p>
-                <p>Email: contact@example.com</p>
-                <p><a href='/'>Back to Home</a></p>"
-        );
+    public function show(ServerRequest $request): Response
+    {
+        return $this->render('contact.html.twig');
     }
 }

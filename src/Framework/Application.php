@@ -5,25 +5,28 @@ declare(strict_types=1);
 namespace App\Framework;
 
 use App\Framework\Routing\Router;
+use App\Framework\Security\SecurityMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use App\Framework\Routing\Exception\RouteNotFoundException;
 use App\Framework\Http\Response;
 
 /**
- * Main application class that handles the request/response lifecycle
+ * Main application class that handles the request/response lifecycle with security
  */
 class Application
 {
     private Router $router;
+    private SecurityMiddleware $security;
 
-    public function __construct(Router $router)
+    public function __construct(Router $router, SecurityMiddleware $security)
     {
         $this->router = $router;
+        $this->security = $security;
     }
 
     /**
-     * Handle the HTTP request and generate a response
+     * Handle the HTTP request and generate a response with security checks
      *
      * @param ServerRequestInterface $request The incoming request
      * @return ResponseInterface The response
@@ -31,16 +34,38 @@ class Application
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         try {
-            $route = $this->router->match($request);
-            $result = $this->router->dispatch($route, $request);
+            // Process request through security middleware
+            return $this->security->process($request, function ($request) {
+                // Handle login error from session if present
+                if ($request->getUri()->getPath() === '/login' && isset($_SESSION['login_error'])) {
+                    $request = $request->withAttribute('error', $_SESSION['login_error']);
+                    unset($_SESSION['login_error']);
+                }
 
-            // If the result is already a response, return it
-            if ($result instanceof ResponseInterface) {
-                return $result;
-            }
+                // Authenticate user
+                $authenticatedRequest = $this->security->authenticate($request);
 
-            // Otherwise, wrap it in a response
-            return $this->wrapResponse($result);
+                // If authentication failed and this is not a public route, redirect to login
+                if ($authenticatedRequest === null) {
+                    return new Response(
+                        302,
+                        ['Location' => '/login'],
+                        ''
+                    );
+                }
+
+                // Process the authenticated request
+                $route = $this->router->match($authenticatedRequest);
+                $result = $this->router->dispatch($route, $authenticatedRequest);
+
+                // If the result is already a response, return it
+                if ($result instanceof ResponseInterface) {
+                    return $result;
+                }
+
+                // Otherwise, wrap it in a response
+                return $this->wrapResponse($result);
+            });
         } catch (RouteNotFoundException $e) {
             return new Response(
                 404,

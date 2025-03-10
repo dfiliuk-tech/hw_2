@@ -272,6 +272,162 @@ The main application class handles the request/response lifecycle:
 
 - `Framework\Application` - Processes requests and generates responses
 
+# Security Implementation Documentation
+
+This document explains the security measures implemented in our PHP framework.
+
+## Overview
+
+The security implementation focuses on addressing the following key areas:
+
+1. **Authentication** - Verifying user identity
+2. **Authorization** - Controlling access based on user roles
+3. **CSRF Protection** - Preventing cross-site request forgery
+4. **XSS Prevention** - Protecting against cross-site scripting
+5. **Secure HTTP Headers** - Strengthening browser security
+6. **SQL Injection Prevention** - Using prepared statements
+7. **Secure Session Management** - Protecting user sessions
+
+## 1. Authentication System
+
+### User Entity
+
+- Implemented a `UserInterface` interface and `User` class to represent users
+- Password hashing using PHP's secure bcrypt implementation (cost factor 12)
+- No plain text passwords stored in the database
+
+### Authentication Provider
+
+- Created `DatabaseAuthProvider` that implements `AuthenticationInterface`
+- Session-based authentication state management
+- Secure password verification using `password_verify()`
+
+### Login Process
+
+- Form-based authentication with CSRF protection
+- Login errors don't reveal whether username or password was incorrect
+- Redirects to original destination after successful login
+
+## 2. Authorization System
+
+### Role-Based Access Control
+
+- Two built-in user roles: 'ROLE_USER' and 'ROLE_ADMIN'
+- Admin Dashboard only accessible to users with 'ROLE_ADMIN' role
+- Authorization checks in controllers and middleware
+
+### Default Users
+
+Two default users are created:
+- Admin (username: 'admin', password: 'admin123')
+- Regular User (username: 'user', password: 'user123')
+
+## 3. CSRF Protection
+
+- CSRF token generation with secure random bytes
+- Token validation for all state-changing operations
+- Token expiration (1 hour by default)
+- Token per session with automatic regeneration
+
+## 4. XSS Prevention
+
+- All user-generated content is escaped using `htmlspecialchars()` with ENT_QUOTES
+- HTML escaping helper method in the `SecurityMiddleware` class
+- Content-Security-Policy header to restrict script sources
+
+## 5. Secure HTTP Headers
+
+Added the following security headers:
+
+- **X-Content-Type-Options: nosniff** - Prevents MIME type sniffing
+- **X-XSS-Protection: 1; mode=block** - Additional XSS protection
+- **X-Frame-Options: DENY** - Prevents clickjacking
+- **Content-Security-Policy** - Restricts resource loading
+- **Referrer-Policy: no-referrer-when-downgrade** - Controls referrer information
+- **Strict-Transport-Security** - Enforces HTTPS (when HTTPS is enabled)
+
+## 6. SQL Injection Prevention
+
+- Used PDO prepared statements for all database operations
+- Parameter binding for all user-supplied data
+- Type casting for numeric values
+
+## 7. Secure Session Management
+
+- HTTP-only cookies to prevent JavaScript access
+- Same-site cookie attribute set to 'Strict'
+- Secure flag enabled when using HTTPS
+- Session data validation before use
+
+## Integration in the Framework
+
+### Security Middleware
+
+The `SecurityMiddleware` class integrates all security features:
+
+- Authentication and authorization checks
+- CSRF token generation and validation
+- Output escaping for XSS prevention
+- Security header management
+
+### Application Integration
+
+The `Application` class was modified to:
+- Process requests through the security middleware
+- Authenticate users for all non-public routes
+- Redirect unauthenticated users to the login page
+
+## How to Use the Security System
+
+### Protecting a Route
+
+Routes in `routes.php` are automatically protected unless they're in the public routes list.
+
+### Checking User Roles in Controllers
+
+```php
+public function dashboard(ServerRequest $request): Response
+{
+    // Verify user has admin role
+    if (!$this->security->verifyAuthorization($request, ['ROLE_ADMIN'])) {
+        return new Response(403, ['Content-Type' => 'text/html'], "Access Denied");
+    }
+    
+    // Admin-only code here
+}
+```
+
+### Adding CSRF Protection to Forms
+
+```php
+// Generate a token
+$csrfToken = $this->security->generateCsrfToken();
+
+// Add to form
+echo '<input type="hidden" name="csrf_token" value="' . $this->security->escapeOutput($csrfToken) . '">';
+
+// Validate in controller
+if (!$this->security->validateCsrfToken($data['csrf_token'])) {
+    // Invalid token handling
+}
+```
+
+### Preventing XSS
+
+```php
+// Always escape output
+echo $this->security->escapeOutput($userProvidedContent);
+```
+
+## Recommendations for Future Enhancements
+
+1. **Password Policies** - Implement password strength requirements and expiration
+2. **Multi-factor Authentication** - Add a second layer of authentication
+3. **API Authentication** - Implement JWT or OAuth for API access
+4. **Rate Limiting** - Prevent brute force attacks
+5. **Audit Logging** - Track security events and user actions
+6. **User Account Management** - Add account recovery, email verification, etc.
+
 ## License
 
 MIT

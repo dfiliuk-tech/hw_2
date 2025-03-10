@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Framework\Routing;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use App\Framework\Routing\Exception\RouteNotFoundException;
 use Psr\Container\ContainerInterface;
@@ -68,6 +70,8 @@ class Router
      * @param array<string, mixed> $route The route to dispatch
      * @param ServerRequestInterface $request The incoming request
      * @return mixed The controller response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function dispatch(array $route, ServerRequestInterface $request): mixed
     {

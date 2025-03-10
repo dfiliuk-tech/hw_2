@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home - Secure Framework{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>Welcome to Our Secure Framework</h2>
+        <p>This is the home page of our application with security enhancements and Twig templates.</p>
+        
+        <h3>Security Features:</h3>
+        <ul>
+            <li>CSRF Protection</li>
+            <li>XSS Prevention</li>
+            <li>Secure HTTP Headers</li>
+            <li>Role-Based Access Control</li>
+            <li>Secure Password Handling</li>
+            <li>Twig Templating Engine</li>
+        </ul>
+    </div>
+    
+    <div class="card">
+        <h3>User Information</h3>
+        {% if user %}
+            <p>You are logged in as: <strong>{{ user.username }}</strong></p>
+            <p>Roles: {{ user.roles|join(', ') }}</p>
+            
+            {% if is_granted('ROLE_ADMIN', user) %}
+                <p>As an admin, you have access to the <a href="{{ '/admin' }}">Admin Dashboard</a>.</p>
+            {% endif %}
+        {% else %}
+            <p>You are not logged in. <a href="{{ '/login' }}">Login</a> to access secure areas.</p>
+        {% endif %}
+    </div>
+{% endblock %}
