@@ -15,6 +15,8 @@ use Psr\Http\Message\ResponseInterface;
 class ApiControllerTest extends TestCase
 {
     private ApiController $apiController;
+    private TwigService $twig;
+    private SecurityMiddleware $security;
 
     protected function setUp(): void
     {

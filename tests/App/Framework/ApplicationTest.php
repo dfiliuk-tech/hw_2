@@ -10,11 +10,9 @@ use App\Framework\Http\ServerRequest;
 use App\Framework\Http\Uri;
 use App\Framework\Routing\Exception\RouteNotFoundException;
 use App\Framework\Routing\Router;
-use App\Framework\Security\DatabaseAuthProvider;
 use App\Framework\Security\SecurityMiddleware;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -22,7 +20,6 @@ class ApplicationTest extends TestCase
 {
     private Router $router;
     private Application $app;
-
     private SecurityMiddleware $securityMiddleware;
 
     /**
@@ -30,19 +27,26 @@ class ApplicationTest extends TestCase
      */
     protected function setUp(): void
     {
-
         $this->router = $this->createMock(Router::class);
-
         $this->securityMiddleware = $this->createMock(SecurityMiddleware::class);
 
-        // Create the application with the router
-        $this->app = new Application($this->router, new SecurityMiddleware(new DatabaseAuthProvider(new \PDO('dns'))));
+        // This will fix the PDO issue by using a mock instead
+        $this->app = new Application($this->router, $this->securityMiddleware);
     }
 
     public function testHandleSuccessfulRequest(): void
     {
         // Create a request
         $request = $this->createRequest('GET', '/test');
+
+        // Set up authentication
+        $this->securityMiddleware->method('process')
+            ->willReturnCallback(function ($request, $next) {
+                return $next($request);
+            });
+
+        $this->securityMiddleware->method('authenticate')
+            ->willReturn($request);
 
         // Set up route matching
         $route = [
@@ -72,6 +76,15 @@ class ApplicationTest extends TestCase
     {
         // Create a request
         $request = $this->createRequest('GET', '/api/test');
+
+        // Set up authentication
+        $this->securityMiddleware->method('process')
+            ->willReturnCallback(function ($request, $next) {
+                return $next($request);
+            });
+
+        $this->securityMiddleware->method('authenticate')
+            ->willReturn($request);
 
         // Set up route matching
         $route = [
@@ -105,6 +118,15 @@ class ApplicationTest extends TestCase
         // Create a request
         $request = $this->createRequest('GET', '/test');
 
+        // Set up authentication
+        $this->securityMiddleware->method('process')
+            ->willReturnCallback(function ($request, $next) {
+                return $next($request);
+            });
+
+        $this->securityMiddleware->method('authenticate')
+            ->willReturn($request);
+
         // Set up route matching
         $route = [
             'controller' => 'TestController',
@@ -137,6 +159,15 @@ class ApplicationTest extends TestCase
         // Create a request
         $request = $this->createRequest('GET', '/not-found');
 
+        // Set up authentication
+        $this->securityMiddleware->method('process')
+            ->willReturnCallback(function ($request, $next) {
+                return $next($request);
+            });
+
+        $this->securityMiddleware->method('authenticate')
+            ->willReturn($request);
+
         // Set up route matching to throw an exception
         $this->router->method('match')
             ->with($request)
@@ -155,6 +186,15 @@ class ApplicationTest extends TestCase
     {
         // Create a request
         $request = $this->createRequest('GET', '/test');
+
+        // Set up authentication
+        $this->securityMiddleware->method('process')
+            ->willReturnCallback(function ($request, $next) {
+                return $next($request);
+            });
+
+        $this->securityMiddleware->method('authenticate')
+            ->willReturn($request);
 
         // Set up route matching to throw an unexpected exception
         $this->router->method('match')
@@ -176,6 +216,7 @@ class ApplicationTest extends TestCase
     private function createRequest(string $method, string $path): ServerRequestInterface
     {
         $uri = new Uri('http://example.com' . $path);
+
         return new ServerRequest($method, $uri);
     }
 }

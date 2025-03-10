@@ -21,13 +21,38 @@ class ControllerIntegrationTest extends TestCase
     private ContainerInterface $container;
     private Router $router;
     private Application $application;
+    private SecurityMiddleware $security;
+    private TwigService $twig;
 
     protected function setUp(): void
     {
-        // Create a mock container
+        // Create mocks
         $this->container = $this->createMock(ContainerInterface::class);
         $this->twig = $this->createMock(TwigService::class);
         $this->security = $this->createMock(SecurityMiddleware::class);
+
+        // Configure mocks for successful authentication
+        $this->security->method('process')
+            ->willReturnCallback(function ($request, $next) {
+                return $next($request);
+            });
+
+        $this->security->method('authenticate')
+            ->willReturnCallback(function ($request) {
+                return $request;
+            });
+
+        // Configure Twig mock to return appropriate templates
+        $this->twig->method('render')
+            ->willReturnCallback(function ($template) {
+                if ($template === 'home.html.twig') {
+                    return '<h1>Welcome to Our Minimal Framework</h1>';
+                }
+                if ($template === 'contact.html.twig') {
+                    return '<h1>Contact Us</h1>';
+                }
+                return 'Default content';
+            });
 
         // Set up the container to return the correct controller instances
         $this->container->method('get')

@@ -19,11 +19,11 @@ return [
     'app.environment' => env('APP_ENV', 'production'),
 
     // Database parameters
-    'db.path' => env('DB_DATABASE', __DIR__ . '/../database/database.sqlite'),
+    'db.path' => env('DB_DATABASE', __DIR__ . '/../../../database/database.sqlite'),
 
     // Twig parameters
-    'twig.templates_path' => __DIR__ . '/../../templates',
-    'twig.cache_path' => __DIR__ . '/../../var/cache/twig',
+    'twig.templates_path' => __DIR__ . '/../Templates',
+    'twig.cache_path' => __DIR__ . '/../../../var/cache/twig',
 
     // Security parameters
     'security.public_routes' => ['/login', '/logout'],
@@ -39,7 +39,12 @@ return [
             mkdir($dbDir, 0755, true);
         }
 
-        $dsn = "sqlite:" . $dbPath;
+        // Ensure the database file exists
+        if (!file_exists($dbPath)) {
+            file_put_contents($dbPath, '');
+        }
+
+        $dsn = "sqlite:{$dbPath}";
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
