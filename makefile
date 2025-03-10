@@ -11,7 +11,7 @@ down:
 # Rebuild Docker containers with no cache
 rebuild:
 	docker-compose down
-	docker-compose build --no-cache
+	docker-compose build #--no-cache
 	docker-compose up -d
 
 
@@ -71,3 +71,13 @@ init: up
 run-app:
 	docker-compose up -d
 	@echo "App is running at http://localhost:8000"
+
+setup-hooks:
+	mkdir -p .git/hooks
+	cp pre-commit-hook .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	echo "Git pre-commit hook installed successfully."
+
+# Check coding style according to PSR-12
+cs-check:
+	docker-compose exec php ./vendor/bin/phpcs --standard=PSR12 src

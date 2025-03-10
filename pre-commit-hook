@@ -1,0 +1,41 @@
+#!/bin/bash
+
+echo "Running pre-commit hook..."
+
+# Get staged PHP files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep "\.php$")
+
+if [[ "$STAGED_FILES" = "" ]]; then
+  echo "No PHP files to check. Skipping pre-commit hook."
+  exit 0
+fi
+
+# Auto-fix code style issues
+echo "Auto-fixing code style issues..."
+docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR12 $STAGED_FILES
+
+# Check for remaining code style issues
+echo "Checking code style..."
+docker-compose exec -T php ./vendor/bin/phpcs --standard=PSR12 $STAGED_FILES
+
+# If code style check failed, abort commit
+if [ $? -ne 0 ]; then
+  echo "Code style check failed. Please fix the issues and try again."
+  exit 1
+fi
+
+# Add the fixed files to the staging area
+git add $STAGED_FILES
+
+# Run unit tests
+echo "Running unit tests..."
+docker-compose exec -T php ./vendor/bin/phpunit --config phpunit-config.xml
+
+# If tests failed, abort commit
+if [ $? -ne 0 ]; then
+  echo "Unit tests failed. Please fix the issues and try again."
+  exit 1
+fi
+
+echo "All checks passed! Proceeding with commit."
+exit 0
