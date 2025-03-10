@@ -42,7 +42,7 @@ analyze:
 
 # Fix coding style issues
 cs-fix:
-	docker-compose exec php vendor/bin/phpcbf --standard=PSR12 src
+	docker-compose exec php vendor/bin/phpcbf --standard=PSR12 src tests
 
 # Run pattern demos
 run-abstract-factory:
