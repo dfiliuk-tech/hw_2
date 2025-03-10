@@ -10,6 +10,7 @@ class ASCIIStack implements ASCIIStackInterface
 
     public function push(string $char): void
     {
+
         $this->stack[] = $char;
     }
 

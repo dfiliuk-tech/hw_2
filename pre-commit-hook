@@ -37,5 +37,29 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Generate test coverage report and check coverage percentage
+echo "Checking test coverage..."
+COVERAGE_OUTPUT=$(docker-compose exec -T -e XDEBUG_MODE=coverage php ./vendor/bin/phpunit --config phpunit-config.xml --coverage-text)
+
+# Extract coverage percentage
+COVERAGE_LINE=$(echo "$COVERAGE_OUTPUT" | grep -i "Lines:" | head -n 1)
+if [[ -z "$COVERAGE_LINE" ]]; then
+  echo "Error: Could not determine test coverage. Make sure Xdebug is properly configured."
+  exit 1
+fi
+
+COVERAGE_PERCENTAGE=$(echo "$COVERAGE_LINE" | grep -o "[0-9]\+\.[0-9]\+%" | grep -o "[0-9]\+\.[0-9]\+")
+COVERAGE_INTEGER=$(echo "$COVERAGE_PERCENTAGE" | cut -d. -f1)
+
+echo "Test coverage: $COVERAGE_PERCENTAGE%"
+
+# Check if coverage meets the minimum threshold
+if (( COVERAGE_INTEGER < 50 )); then
+  echo "Error: Test coverage is below the minimum requirement of 50%."
+  echo "Your test coverage is $COVERAGE_PERCENTAGE%."
+  echo "Please improve your test coverage before committing."
+  exit 1
+fi
+
 echo "All checks passed! Proceeding with commit."
 exit 0
