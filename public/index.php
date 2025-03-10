@@ -18,8 +18,6 @@ $containerBuilder->enableCompilation(__DIR__ . '/../var/cache');
 
 $container = $containerBuilder->build();
 
-$app = new Application($container);
-
 // Configure routes from configuration file
 $router = $container->get(Router::class);
 $routes = require __DIR__ . '/../src/FrameworkApp/config/routes.php';
@@ -32,6 +30,7 @@ foreach ($routes as [$method, $path, $controller, $action]) {
     ]);
 }
 
+$app = new Application($router);
 
 $response = $app->handle($request);
 

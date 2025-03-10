@@ -36,7 +36,8 @@
   "scripts": {
     "analyze": [
       "phpstan analyze -l 5 src",
-      "phpmd src text cleancode,codesize,controversial,design,naming,unusedcode"
+      "phpmd src text cleancode,codesize,controversial,design,naming,unusedcode",
+      "phpcs --standard=PSR12 src"
     ],
     "phpunit/phpunit": "^10.0"
   }
