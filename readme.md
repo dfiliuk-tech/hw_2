@@ -1,5 +1,5 @@
 # Minimal PHP Framework
-
+![PHP CI Pipeline](https://github.com/username/repo-name/actions/workflows/php-ci.yml/badge.svg)
 A lightweight PHP framework skeleton with PSR-7 and PSR-11 compatibility.
 
 ## Features

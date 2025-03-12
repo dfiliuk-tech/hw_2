@@ -5,8 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-      platforms:
-        - "linux/amd64"
     # No volumes - everything is in the image for production
     environment:
       - DB_CONNECTION=sqlite
