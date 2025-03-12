@@ -7,6 +7,7 @@ namespace App\Framework\Security;
 use App\Framework\Http\ServerRequest;
 use App\Framework\Http\Response;
 use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Random\RandomException;
 
 class SecurityMiddleware
@@ -28,7 +29,7 @@ class SecurityMiddleware
         ], $options);
     }
 
-    public function process(ServerRequest $request, callable $next): Response
+    public function process(ServerRequestInterface $request, callable $next): Response
     {
         // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {

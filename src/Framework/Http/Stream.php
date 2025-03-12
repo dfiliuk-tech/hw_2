@@ -35,7 +35,9 @@ class Stream implements StreamInterface
 
     /**
      * @var string|null
+     * @phpstan-impure property.neverRead
      */
+    // @phpstan-ignore-next-line
     private ?string $uri;
 
     /**
@@ -67,11 +69,11 @@ class Stream implements StreamInterface
         $this->stream = $body;
         $meta = stream_get_meta_data($this->stream);
         $this->seekable = $meta['seekable'];
-        $this->readable = (strpos($meta['mode'], 'r') !== false || strpos($meta['mode'], '+') !== false);
-        $this->writable = (strpos($meta['mode'], 'w') !== false ||
-                          strpos($meta['mode'], 'a') !== false ||
-                          strpos($meta['mode'], '+') !== false);
-        $this->uri = $meta['uri'] ?? null;
+        $this->readable = (str_contains($meta['mode'], 'r') || str_contains($meta['mode'], '+'));
+        $this->writable = (str_contains($meta['mode'], 'w') ||
+            str_contains($meta['mode'], 'a') ||
+            str_contains($meta['mode'], '+'));
+        $this->uri = $meta['uri'];
     }
 
     /**
@@ -110,7 +112,6 @@ class Stream implements StreamInterface
         $result = $this->stream;
         $this->stream = null;
         $this->size = null;
-        $this->uri = null;
         $this->readable = false;
         $this->writable = false;
         $this->seekable = false;

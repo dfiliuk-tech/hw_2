@@ -13,15 +13,11 @@ use App\Framework\View\TwigService;
 
 class AdminController extends AbstractController
 {
-    private AuthenticationInterface $auth;
-
     public function __construct(
-        AuthenticationInterface $auth,
         TwigService $twig,
         SecurityMiddleware $security
     ) {
         parent::__construct($twig, $security);
-        $this->auth = $auth;
     }
 
     public function dashboard(ServerRequest $request): Response
