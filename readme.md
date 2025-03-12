@@ -41,20 +41,70 @@ A lightweight PHP framework skeleton with PSR-7 and PSR-11 compatibility.
 └── composer.json           # Composer configuration
 ```
 
+## Docker Configuration
+
+Our optimized Docker setup uses a multi-stage build approach to improve performance and provide tailored environments for development and production:
+
+### Dockerfile Stages
+- **base**: Common PHP dependencies and extensions
+- **development**: Includes debugging tools (Xdebug, PCOV) and Composer
+- **builder**: Optimized for building production dependencies
+- **production**: Minimal runtime image without development tools
+
 ## Setup and Installation
+
+### For Local Development
 
 1. Clone the repository
 2. Start the Docker containers:
-   ```
+   ```bash
    docker-compose up -d
    ```
+   This uses the `development` stage with mounted volumes for real-time code changes.
+
 3. Install dependencies:
-   ```
+   ```bash
    docker-compose exec php composer install
    ```
+
 4. Access the application:
    ```
    http://localhost:8000
+   ```
+
+### For Production Deployment
+
+1. Deploy using the production configuration:
+   ```bash
+   docker-compose -f docker-compose.prod.yaml up -d
+   ```
+   This uses the optimized `production` stage with compiled dependencies.
+
+2. For a standalone production build:
+   ```bash
+   docker build --target production -t myapp:prod .
+   ```
+
+### Environment Management
+
+- Toggle Xdebug in development:
+   ```bash
+   XDEBUG_MODE=debug docker-compose up -d
+   ```
+
+- Running with custom build arguments:
+   ```bash
+   docker-compose build --build-arg PHP_VERSION=8.3
+   ```
+
+### Docker Performance Tips
+
+- **Layer Caching**: The Dockerfile is structured to maximize cache hits. Avoid unnecessary `docker-compose down` to preserve cache.
+- **Volume Mounts**: In development, code changes don't require rebuilding the container.
+- **Composer Cache**: For faster dependency installation, you can mount a Composer cache volume:
+   ```yaml
+   volumes:
+     - ~/.composer:/root/.composer
    ```
 
 ## Creating and Registering Routes

@@ -8,7 +8,7 @@ use App\Framework\Security\SecurityMiddleware;
 use App\Framework\View\TwigService;
 use Psr\Container\ContainerInterface;
 
-use function DI\create;
+use function DI\autowire;
 use function DI\factory;
 use function DI\get;
 use function DI\env;
@@ -74,6 +74,8 @@ return [
 
         return new TwigService($templatesPath, $cachePath, $debug);
     }),
+    DatabaseAuthProvider::class => autowire()
+        ->constructorParameter('PDO', get(PDO::class)),
 
     AuthenticationInterface::class => DI\create(DatabaseAuthProvider::class),
 
