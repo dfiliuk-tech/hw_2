@@ -45,17 +45,16 @@ jobs:
 
       - name: Run test coverage
         run: |
-          XDEBUG_MODE=coverage vendor/bin/phpunit --config phpunit-config.xml --log-junit junit.xml
+          XDEBUG_MODE=coverage vendor/bin/phpunit --config phpunit-config.xml --coverage-clover coverage.xml .
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        env: ${{ secrets.CODECOV_ORG_TOKEN }}
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_ORG_TOKEN }}
 
 
   static-analysis:
