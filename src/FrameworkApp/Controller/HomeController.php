@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace App\FrameworkApp\Controller;
 
-use Psr\Http\Message\ServerRequestInterface;
+use App\Framework\Controller\AbstractController;
 use App\Framework\Http\Response;
+use App\Framework\Http\ServerRequest;
+use App\Framework\Security\SecurityMiddleware;
+use App\Framework\View\TwigService;
 
-class HomeController
+class HomeController extends AbstractController
 {
-    public function index(ServerRequestInterface $request): Response
+    public function __construct(TwigService $twig, SecurityMiddleware $security)
     {
-        return new Response(
-            200,
-            ['Content-Type' => 'text/html'],
-            "<h1>Welcome to Our Minimal Framework</h1>
-                <p>This is the home page of our application.</p>
-                <ul>
-                    <li><a href='/api/status'>API Status</a></li>
-                    <li><a href='/contact'>Contact</a></li>
-                </ul>"
-        );
+        parent::__construct($twig, $security);
+    }
+
+    public function index(ServerRequest $request): Response
+    {
+        return $this->render('home.html.twig', [
+            'page_title' => 'Home'
+        ]);
     }
 }

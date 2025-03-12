@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login - Secure Framework{% endblock %}
+
+{% block header %}Login{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>Login</h2>
+        
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="post" action="{{ '/login' }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit">Login</button>
+        </form>
+        
+        <p style="margin-top: 20px;">
+            <strong>Demo Accounts:</strong><br>
+            Admin: username = "admin", password = "admin123"<br>
+            User: username = "user", password = "user123"
+        </p>
+    </div>
+{% endblock %}

@@ -15,6 +15,7 @@ $request = ServerRequest::fromGlobals();
 $containerBuilder = new ContainerBuilder();
 
 $containerBuilder->enableCompilation(__DIR__ . '/../var/cache');
+$containerBuilder->addDefinitions(__DIR__ . '/../src/FrameworkApp/config/config.php');
 
 $container = $containerBuilder->build();
 
@@ -30,7 +31,7 @@ foreach ($routes as [$method, $path, $controller, $action]) {
     ]);
 }
 
-$app = new Application($router);
+$app = new Application($router, $container->get(App\Framework\Security\SecurityMiddleware::class));
 
 $response = $app->handle($request);
 

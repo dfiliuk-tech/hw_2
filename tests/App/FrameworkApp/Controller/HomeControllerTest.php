@@ -7,58 +7,67 @@ namespace Tests\App\FrameworkApp\Controller;
 use App\Framework\Http\Response;
 use App\Framework\Http\ServerRequest;
 use App\Framework\Http\Uri;
+use App\Framework\Security\SecurityMiddleware;
+use App\Framework\View\TwigService;
 use App\FrameworkApp\Controller\HomeController;
 use PHPUnit\Framework\TestCase;
 
 class HomeControllerTest extends TestCase
 {
-    private HomeController $homeController;
+    private HomeController $controller;
+    private TwigService $twig;
+    private SecurityMiddleware $security;
 
     protected function setUp(): void
     {
-        $this->homeController = new HomeController();
+        // Create mocks for dependencies
+        $this->twig = $this->createMock(TwigService::class);
+        $this->security = $this->createMock(SecurityMiddleware::class);
+
+        // Create the controller
+        $this->controller = new HomeController($this->twig, $this->security);
     }
 
-    public function testIndexReturnsValidResponse(): void
+    public function testIndex(): void
     {
         // Create a request
         $uri = new Uri('http://example.com/');
         $request = new ServerRequest('GET', $uri);
 
-        // Call the index action
-        $response = $this->homeController->index($request);
+        // Mock the twig render method to return a test content
+        $this->twig->expects($this->once())
+            ->method('render')
+            ->with(
+                $this->equalTo('home.html.twig'),
+                $this->callback(function ($context) {
+                    return isset($context['page_title']) &&
+                        $context['page_title'] === 'Home';
+                })
+            )
+            ->willReturn('<html>Home content</html>');
 
-        // Assert it's a Response object
+        // Call the index method
+        $response = $this->controller->index($request);
+
+        // Verify response
         $this->assertInstanceOf(Response::class, $response);
-
-        // Assert status code
         $this->assertEquals(200, $response->getStatusCode());
-
-        // Assert Content-Type header
-        $this->assertEquals('text/html', $response->getHeaderLine('Content-Type'));
-
-        // Get body content
-        $body = (string) $response->getBody();
-
-        // Assert body content
-        $this->assertStringContainsString('<h1>Welcome to Our Minimal Framework</h1>', $body);
-        $this->assertStringContainsString('This is the home page', $body);
+        $this->assertEquals('<html>Home content</html>', (string)$response->getBody());
     }
 
-    public function testResponseIncludesNavigationLinks(): void
+    /**
+     * This test verifies that the controller correctly initializes and passes
+     * the security middleware to the twig service
+     */
+    public function testSecurityMiddlewareIntegration(): void
     {
-        // Create a request
-        $uri = new Uri('http://example.com/');
-        $request = new ServerRequest('GET', $uri);
+        // The SecurityMiddleware should be passed to the Twig service
+        // during constructor (in AbstractController)
+        $this->twig->expects($this->once())
+            ->method('setSecurityMiddleware')
+            ->with($this->security);
 
-        // Call the index action
-        $response = $this->homeController->index($request);
-
-        // Get body content
-        $body = (string) $response->getBody();
-
-        // Verify all navigation links are present
-        $this->assertStringContainsString('<a href=\'/api/status\'>API Status</a>', $body);
-        $this->assertStringContainsString('<a href=\'/contact\'>Contact</a>', $body);
+        // Re-create the controller to trigger the initialization
+        $controller = new HomeController($this->twig, $this->security);
     }
 }
